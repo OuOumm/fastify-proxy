@@ -1,0 +1,40 @@
+{
+  "name": "fastify-proxy",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "High-performance Fastify reverse proxy server",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon --exec node app.js",
+    "watch": "node --watch app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "proxy",
+    "reverse-proxy",
+    "fastify",
+    "http-proxy",
+    "cdn"
+  ],
+  "author": "OuOumm",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "packageManager": "pnpm@10.13.1",
+  "dependencies": {
+    "@fastify/reply-from": "^12.3.1",
+    "fastify": "^5.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "typescript"
+      ]
+    }
+  }
+}
