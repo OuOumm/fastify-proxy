@@ -21,7 +21,7 @@ RULES.forEach(rule =>
       const path = req.url.slice(rule.prefix.length);
       const url = rule.dynamic ? new URL(path) : new URL(path, rule.target);
       reply.from(url.href, {
-        rewriteRequestHeaders: () => ({ ...req.headers, ...rule.headers, host: url.host })
+        rewriteRequestHeaders: () => ({ ...req.headers, ...rule.headers, host: url.host, referer: url.href })
       });
     } catch { reply.status(400).send() }
   })
