@@ -8,8 +8,8 @@ const app = Fastify({ logger: true }).register(fastifyReplyFrom);
 const html = await readFile("index.html", "utf8").catch(() => '<h1>Proxy Server</h1>');
 const icon = await readFile("favicon.ico").catch(() => null);
 const RULES = [
-  { prefix: "/gh/", target: "https://gcore.jsdelivr.net/gh/", headers: { "x-test": "test" } },
-  { prefix: "/proxy/", dynamic: true },
+  { prefix: "/gh/", target: "https://cdn.jsdelivr.net/gh/" },
+  { prefix: "/proxy/", isDynamic: true },
 ];
 
 // 路由
@@ -19,9 +19,9 @@ RULES.forEach(rule =>
   app.all(`${rule.prefix}*`, (req, reply) => {
     try {
       const path = req.url.slice(rule.prefix.length);
-      const url = rule.dynamic ? new URL(path) : new URL(path, rule.target);
+      const url = rule.isDynamic ? new URL(path) : new URL(path, rule.target);
       reply.from(url.href, {
-        rewriteRequestHeaders: () => ({ ...req.headers, ...rule.headers, host: url.host, referer: url.href })
+        rewriteRequestHeaders: () => ({ ...rule.headers })
       });
     } catch { reply.status(400).send() }
   })
