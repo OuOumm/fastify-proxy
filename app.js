@@ -15,13 +15,13 @@ const RULES = [
 // 路由
 app.get('/', (_, r) => r.type('text/html').send(html));
 app.get('/favicon.ico', (_, r) => r.type('image/x-icon').send(icon).code(icon ? 200 : 404));
-RULES.forEach(rule => 
+RULES.forEach(rule =>
   app.all(`${rule.prefix}*`, (req, reply) => {
     try {
       const path = req.url.slice(rule.prefix.length);
       const url = rule.isDynamic ? new URL(path) : new URL(path, rule.target);
       reply.from(url.href, {
-        rewriteRequestHeaders: () => ({ ...rule.headers })
+        rewriteRequestHeaders: () => ({ ...req.headers, host: url.host, referer: url.origin, ...rule.headers })
       });
     } catch { reply.status(400).send() }
   })
