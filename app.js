@@ -8,7 +8,7 @@ const app = Fastify({ logger: true }).register(fastifyReplyFrom);
 const html = await readFile("index.html", "utf8").catch(() => '<h1>Proxy Server</h1>');
 const icon = await readFile("favicon.ico").catch(() => null);
 const RULES = [
-  { prefix: "/gh/", target: "https://cdn.jsdelivr.net/gh/" },
+  { prefix: "/gh/", target: "https://cdn.jsdelivr.net/gh/" , headers: { "x-test": "test" }},
   { prefix: "/proxy/", isDynamic: true },
 ];
 
