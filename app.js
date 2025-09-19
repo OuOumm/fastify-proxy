@@ -4,7 +4,7 @@ import fastifyReplyFrom from '@fastify/reply-from';
 
 // 初始化
 const PORT = 23000;
-const app = Fastify({ logger: true }).register(fastifyReplyFrom);
+const app = Fastify({ logger: true }).register(fastifyReplyFrom, { cacheURLs: 0, bodyLimit: 0 });
 const html = await readFile("index.html", "utf8").catch(() => '<h1>Proxy Server</h1>');
 const icon = await readFile("favicon.ico").catch(() => null);
 const RULES = [
