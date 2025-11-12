@@ -4,11 +4,11 @@ import fastifyReplyFrom from '@fastify/reply-from';
 
 // 初始化
 const PORT = 23000;
-const app = Fastify({ logger: true }).register(fastifyReplyFrom, { cacheURLs: 0, bodyLimit: 0 });
+const app = Fastify({ logger: true }).register(fastifyReplyFrom);
 const html = await readFile("index.html", "utf8").catch(() => '<h1>Proxy Server</h1>');
 const icon = await readFile("favicon.ico").catch(() => null);
 const RULES = [
-  { prefix: "/gh/", target: "https://cdn.jsdelivr.net/gh/" , headers: { "x-test": "test" }},
+  { prefix: "/gh/", target: "https://gcore.jsdelivr.net/gh/" , headers: { "x-test": "test" }},
   { prefix: "/proxy/", isDynamic: true },
 ];
 
@@ -22,9 +22,8 @@ RULES.forEach(rule =>
       const url = rule.isDynamic ? new URL(path) : new URL(path, rule.target);
       reply.from(url.href, {
         rewriteRequestHeaders: () => ({ ...req.headers, host: url.host, referer: url.origin, ...rule.headers }),
-        onResponse: (res, _) => { if (res.statusCode !== 200) reply.status(404).send(); }
       });
-    } catch { reply.status(404).send() }
+    } catch { reply.status(400).send(); }
   })
 );
 
