@@ -21,9 +21,10 @@ RULES.forEach(rule =>
       const path = req.url.slice(rule.prefix.length);
       const url = rule.isDynamic ? new URL(path) : new URL(path, rule.target);
       reply.from(url.href, {
-        rewriteRequestHeaders: () => ({ ...req.headers, host: url.host, referer: url.origin, ...rule.headers })
+        rewriteRequestHeaders: () => ({ ...req.headers, host: url.host, referer: url.origin, ...rule.headers }),
+        onResponse: (res, _) => { if (res.statusCode !== 200) reply.status(404).send(); }
       });
-    } catch { reply.status(400).send() }
+    } catch { reply.status(404).send() }
   })
 );
 
