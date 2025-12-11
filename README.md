@@ -27,7 +27,7 @@
 #### 1. 克隆项目
 
 ```bash
-git clone https://github.com/your-username/fastify-proxy.git
+git clone https://github.com/ououmm/fastify-proxy.git
 cd fastify-proxy
 ```
 
@@ -105,7 +105,7 @@ pnpm watch
 
 支持所有 HTTP 方法（GET、POST、PUT、DELETE、PATCH 等）。
 
-## 🐳 Docker 部署
+## 🐳 Docker 部署(暂无)
 
 ### 使用 Docker 运行
 
