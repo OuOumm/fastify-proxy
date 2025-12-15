@@ -2,10 +2,10 @@ FROM node:24-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml* ./
+COPY package.json pnpm-lock.yaml ./
 
-RUN npm install -g pnpm --no-cache --no-progress && \
-    pnpm install --prod --frozen-lockfile --no-progress && \
+RUN npm install -g pnpm --no-cache && \
+    pnpm install --prod --frozen-lockfile && \
     rm -rf /usr/local/lib/node_modules/pnpm /root/.npm /root/.pnpm-store
 
 FROM node:24-alpine
