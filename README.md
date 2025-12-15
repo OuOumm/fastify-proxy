@@ -1,9 +1,9 @@
 <div align="center">
 
 # Fastify 高性能反向代理服务器
-[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/) [![Fastify](https://img.shields.io/badge/Fastify-5.x-blue.svg)](https://fastify.dev/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D24.0.0-brightgreen.svg)](https://nodejs.org/) [![Fastify](https://img.shields.io/badge/Fastify-5.x-blue.svg)](https://fastify.dev/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-一个基于 Fastify 构建的高性能、轻量级反向代理服务器，支持 CDN 加速和动态代理功能。
+一个基于 Fastify 构建的高性能、轻量级反向代理服务器，支持 CDN 加速和动态代理功能。自动集成 GitHub Actions 进行 Docker 构建和推送。
 </div>
 
 ## 🌟 项目特性
@@ -19,8 +19,8 @@
 
 ### 环境要求
 
-- Node.js ≥ 18.0.0
-- pnpm ≥ 8.0.0（推荐）
+- Node.js ≥ 24
+- pnpm ≥ 10.13.1（推荐）
 
 ### 安装步骤
 
@@ -68,7 +68,7 @@ pnpm watch
 
 ### 代理规则配置
 
-项目内置以下代理规则：
+项目内置以下代理规则（定义在 `config.json` 文件中）：
 
 #### 1. GitHub CDN 加速
 - **路径前缀**：`/gh/`
@@ -85,7 +85,7 @@ pnpm watch
 #### 2. 动态代理
 - **路径前缀**：`/proxy/`
 - **功能**：支持任意 URL 的动态代理
-- **用法**：在 `/proxy/` 后直接添加目标 URL
+- **用法**：在 `/proxy/` 后直接添加完整的目标 URL
 
 **示例**：
 ```
@@ -105,9 +105,13 @@ pnpm watch
 
 支持所有 HTTP 方法（GET、POST、PUT、DELETE、PATCH 等）。
 
-## 🐳 Docker 部署(暂无)
+## 🐳 Docker 部署
 
-### 使用 Docker 运行
+### 自动构建
+
+项目已集成 GitHub Actions，当代码推送到 `main` 分支或创建版本标签时，会自动构建 Docker 镜像并推送到 GitHub Packages Docker 注册表。
+
+### 手动构建与运行
 
 ```bash
 # 构建镜像
@@ -129,6 +133,18 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
+    volumes:
+      - ./config.json:/app/config.json:ro
+```
+
+### 使用 GitHub Packages 镜像
+
+```bash
+# 拉取镜像
+docker pull ghcr.io/OuOumm/fastify-proxy:latest
+
+# 运行容器
+docker run -d -p 23000:23000 --name fastify-proxy ghcr.io/OuOumm/fastify-proxy:latest
 ```
 
 ## ⚙️ 配置说明
@@ -142,17 +158,18 @@ services:
 
 ### 自定义配置
 
-如需自定义代理规则，请编辑 `app.js` 中的 `RULES` 数组：
+如需自定义代理规则，请编辑 `config.json` 文件：
 
-```javascript
-const RULES = [
-  { 
-    prefix: "/your-prefix/", 
-    target: "https://your-target.com/",
-    headers: { "Custom-Header": "value" }
+```json
+[
+  {
+    "prefix": "/your-prefix/",
+    "target": "https://your-target.com/",
+    "headers": { "Custom-Header": "value" },
+    "isDynamic": false
   },
   // 添加更多规则...
-];
+]
 ```
 
 ## 🧪 开发指南
@@ -161,12 +178,19 @@ const RULES = [
 
 ```
 fastify-proxy/
-├── app.js          # 主应用文件
-├── package.json    # 项目配置
-├── index.html      # 主页模板
-├── favicon.ico     # 站点图标
-├── .gitignore      # Git 忽略规则
-└── README.md       # 项目文档
+├── app.js              # 主应用文件
+├── package.json        # 项目配置
+├── index.html          # 主页模板
+├── favicon.ico         # 站点图标
+├── config.json         # 代理规则配置
+├── Dockerfile          # Docker 构建文件
+├── .dockerignore       # Docker 忽略规则
+├── .github/
+│   └── workflows/
+│       └── docker-build.yml  # GitHub Actions 工作流
+├── .gitignore          # Git 忽略规则
+├── LICENSE             # 许可证文件
+└── README.md           # 项目文档
 ```
 
 ### 开发脚本

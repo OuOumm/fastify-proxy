@@ -20,11 +20,12 @@
   "author": "OuOumm",
   "license": "MIT",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=24"
   },
   "packageManager": "pnpm@10.13.1",
   "dependencies": {
-    "@fastify/reply-from": "^12.4.0",
+    "@fastify/reply-from": "^12.5.0",
+    "autocannon": "^8.0.0",
     "fastify": "^5.6.2"
   },
   "devDependencies": {
