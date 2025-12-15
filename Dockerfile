@@ -19,7 +19,10 @@ WORKDIR /app
 
 # 减少镜像层，合并复制命令
 COPY --from=builder /app/node_modules ./node_modules
-COPY app.js index.html config.json favicon.ico ./
+COPY app.js index.html config-demo.json favicon.ico ./
+
+# 将配置示例文件重命名为正式配置文件
+RUN cp config-demo.json config.json
 
 # 清理alpine镜像中的不必要文件
 RUN rm -rf /var/cache/apk/* /tmp/* /root/.npm

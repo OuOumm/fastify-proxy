@@ -45,7 +45,15 @@ npm install
 yarn install
 ```
 
-#### 3. 启动服务
+#### 3. 配置文件
+
+将配置示例文件重命名为正式配置文件：
+
+```bash
+cp config-demo.json config.json
+```
+
+#### 4. 启动服务
 
 **开发模式**（带热重载）：
 ```bash
@@ -68,7 +76,7 @@ pnpm watch
 
 ### 代理规则配置
 
-项目内置以下代理规则（定义在 `config.json` 文件中）：
+项目内置以下代理规则（定义在 `config-demo.json` 文件中，需重命名为 `config.json` 后使用）：
 
 #### 1. GitHub CDN 加速
 - **路径前缀**：`/gh/`
@@ -135,6 +143,7 @@ services:
       - NODE_ENV=production
     volumes:
       - ./config.json:/app/config.json:ro
+    # 注意：首次运行需将 config-demo.json 重命名为 config.json
 ```
 
 ### 使用 GitHub Packages 镜像
@@ -158,7 +167,7 @@ docker run -d -p 23000:23000 --name fastify-proxy ghcr.io/OuOumm/fastify-proxy:l
 
 ### 自定义配置
 
-如需自定义代理规则，请编辑 `config.json` 文件：
+如需自定义代理规则，请编辑 `config-demo.json` 文件后重命名为 `config.json`：
 
 ```json
 [
@@ -182,7 +191,7 @@ fastify-proxy/
 ├── package.json        # 项目配置
 ├── index.html          # 主页模板
 ├── favicon.ico         # 站点图标
-├── config.json         # 代理规则配置
+├── config-demo.json    # 代理规则配置示例（需重命名为 config.json 使用）
 ├── Dockerfile          # Docker 构建文件
 ├── .dockerignore       # Docker 忽略规则
 ├── .github/
@@ -238,7 +247,7 @@ fastify-proxy/
 ## 🙋‍♂️ 常见问题
 
 ### Q: 如何添加新的代理规则？
-A: 编辑 `app.js` 中的 `RULES` 数组，按照现有格式添加新的规则。
+A: 编辑 `config-demo.json` 文件后重命名为 `config.json`，按照现有格式添加新的规则。
 
 ### Q: 支持 HTTPS 吗？
 A: 均支持。
