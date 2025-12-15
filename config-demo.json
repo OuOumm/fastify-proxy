@@ -1,0 +1,11 @@
+[
+  {
+    "prefix": "/gh/",
+    "target": "https://gcore.jsdelivr.net/gh/",
+    "headers": { "x-test": "test" }
+  },
+  {
+    "prefix": "/proxy/",
+    "isDynamic": true
+  }
+]
