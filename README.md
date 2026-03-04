@@ -8,14 +8,15 @@
 
 ## 🌟 项目特性
 
-- ⚡ **极致性能**：基于 Fastify 框架，提供超高性能的 HTTP 代理服务
+- ⚡ **极致性能**：基于 Fastify 框架，提供超高性能的 HTTP/HTTPS 代理服务
+- 🔐 **HTTPS 支持**：内置 SSL/TLS 支持，可配置 HTTPS 反向代理
 - 🔄 **智能路由**：支持静态路由规则和动态代理配置
 - 🌐 **CDN 集成**：内置 jsDelivr CDN 加速支持
 - 🛡️ **安全可靠**：完善的错误处理和请求验证
 - 🎯 **易于部署**：零配置启动，支持 Docker 容器化
 - 📱 **响应式设计**：内置美观的 404 页面和响应式界面
 
-## 🚀 快速开始
+## 🚀 快速开始 
 
 ### 环境要求
 
@@ -70,7 +71,7 @@ pnpm start
 pnpm watch
 ```
 
-服务将在 `http://localhost:23000` 启动。
+服务将在 `http://localhost:80` 启动。
 
 ## 📖 使用说明
 
@@ -87,7 +88,7 @@ pnpm watch
 **示例**：
 ```
 原始地址：https://raw.githubusercontent.com/user/repo/main/file.js
-代理地址：http://localhost:23000/gh/user/repo/main/file.js
+代理地址：http://localhost/gh/user/repo/main/file.js
 ```
 
 #### 2. 动态代理
@@ -98,7 +99,31 @@ pnpm watch
 **示例**：
 ```
 目标网站：https://example.com/api/data
-代理地址：http://localhost:23000/proxy/https://example.com/api/data
+代理地址：http://localhost/proxy/https://example.com/api/data
+```
+
+#### 3. 自定义请求头
+
+可以为代理规则添加自定义请求头，用于满足特定需求：
+
+```json
+{
+  "prefix": "/i/",
+  "target": "https://example.com/images/",
+  "headers": { "x-custom-header": "value" }
+}
+```
+
+#### 4. 图片代理示例
+
+代理 Imgur 图片并添加必要的 Referer：
+
+```json
+{
+  "prefix": "/imgur/",
+  "target": "https://i.imgur.com/",
+  "headers": { "referer": "https://imgur.com/" }
+}
 ```
 
 ### API 接口
@@ -126,7 +151,7 @@ pnpm watch
 docker build -t fastify-proxy .
 
 # 运行容器
-docker run -d -p 23000:23000 --name fastify-proxy fastify-proxy
+docker run -d -p 80:80 -p 443:443 --name fastify-proxy fastify-proxy
 ```
 
 ### Docker Compose
@@ -137,12 +162,15 @@ services:
   fastify-proxy:
     build: .
     ports:
-      - "23000:23000"
+      - "80:80"
+      - "443:443"
     restart: unless-stopped
     environment:
       - NODE_ENV=production
     volumes:
       - ./config.json:/app/config.json:ro
+      - ./server.key:/app/server.key:ro
+      - ./server.crt:/app/server.crt:ro
     # 注意：首次运行需将 config-demo.json 重命名为 config.json
 ```
 
@@ -153,7 +181,7 @@ services:
 docker pull ghcr.io/OuOumm/fastify-proxy:latest
 
 # 运行容器
-docker run -d -p 23000:23000 --name fastify-proxy ghcr.io/OuOumm/fastify-proxy:latest
+docker run -d -p 80:80 -p 443:443 --name fastify-proxy ghcr.io/OuOumm/fastify-proxy:latest
 ```
 
 ## ⚙️ 配置说明
@@ -162,8 +190,45 @@ docker run -d -p 23000:23000 --name fastify-proxy ghcr.io/OuOumm/fastify-proxy:l
 
 | 变量名 | 默认值 | 说明 |
 |--------|--------|------|
-| `PORT` | 23000 | 服务监听端口 |
+| `PORT` | 80 | HTTP 服务监听端口 |
 | `NODE_ENV` | development | 运行环境 |
+
+### 配置文件
+
+配置文件 `config.json` 采用 JSON 格式，支持以下选项：
+
+```json
+{
+  "port": 80,
+  "ssl": {
+    "enabled": false,
+    "key": "server.key",
+    "cert": "server.crt",
+    "port": 443
+  },
+  "rules": []
+}
+```
+
+| 配置项 | 类型 | 说明 |
+|--------|------|------|
+| `port` | number | HTTP 监听端口 |
+| `ssl.enabled` | boolean | 是否启用 HTTPS |
+| `ssl.key` | string | SSL 私钥文件路径 |
+| `ssl.cert` | string | SSL 证书文件路径 |
+| `ssl.port` | number | HTTPS 监听端口 |
+| `rules` | array | 代理规则列表 |
+
+### 代理规则配置
+
+每个代理规则支持以下属性：
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `prefix` | string | 路径前缀（如 `/gh/`） |
+| `target` | string | 目标服务器地址 |
+| `headers` | object | 自定义请求头 |
+| `isDynamic` | boolean | 是否为动态代理 |
 
 ### 自定义配置
 
@@ -191,7 +256,10 @@ fastify-proxy/
 ├── package.json        # 项目配置
 ├── index.html          # 主页模板
 ├── favicon.ico         # 站点图标
-├── config-demo.json    # 代理规则配置示例（需重命名为 config.json 使用）
+├── config.json         # 运行时配置文件（由 config-demo.json 重命名生成）
+├── config-demo.json    # 代理规则配置示例
+├── server.key          # SSL 私钥文件（启用 HTTPS 时需要）
+├── server.crt          # SSL 证书文件（启用 HTTPS 时需要）
 ├── Dockerfile          # Docker 构建文件
 ├── .dockerignore       # Docker 忽略规则
 ├── .github/
