@@ -1,3 +1,5 @@
 node_modules
 .trae
 config.json
+server.crt
+server.key

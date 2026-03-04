@@ -1,11 +1,20 @@
-[
-  {
-    "prefix": "/gh/",
-    "target": "https://gcore.jsdelivr.net/gh/",
-    "headers": { "x-test": "test" }
+{
+  "port": 23000,
+  "ssl": {
+    "enabled": true,
+    "key": "server.key",
+    "cert": "server.crt",
+    "port": 23001
   },
-  {
-    "prefix": "/proxy/",
-    "isDynamic": true
-  }
-]
+  "rules": [
+    {
+      "prefix": "/gh/",
+      "target": "https://gcore.jsdelivr.net/gh/",
+      "headers": { "x-test": "test" }
+    },
+    {
+      "prefix": "/proxy/",
+      "isDynamic": true
+    }
+  ]
+}
