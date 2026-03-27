@@ -3,14 +3,14 @@ import { readFile } from 'fs/promises';
 import { readFileSync } from 'fs';
 import fastifyReplyFrom from '@fastify/reply-from';
 
+const icon = await readFile("favicon.ico").catch(() => null);
+const html = await readFile("index.html", "utf8").catch(() => '<h1>Proxy Server</h1>');
 const config = JSON.parse(await readFile("config.json", "utf8").catch(() => { throw new Error('配置文件不存在，请创建后再启动') }));
 const app = Fastify({ 
-  logger: true, 
+  logger: config.logger, 
   https: config.ssl?.enabled ? { key: readFileSync(config.ssl.key), cert: readFileSync(config.ssl.cert) } : undefined
 }).register(fastifyReplyFrom);
 
-const html = await readFile("index.html", "utf8").catch(() => '<h1>Proxy Server</h1>');
-const icon = await readFile("favicon.ico").catch(() => null);
 app.get('/', (_, r) => r.type('text/html').send(html));
 app.get('/favicon.ico', (_, r) => r.type('image/x-icon').send(icon).code(icon ? 200 : 404));
 config.rules.forEach(rule =>
@@ -25,6 +25,4 @@ config.rules.forEach(rule =>
   })
 );
 app.all('*', (_, reply) => reply.status(404).type('text/html').send(html.replaceAll('404 Server', '404 Not Found')));
-
-// 启动
 app.listen({ port: config.ssl?.enabled ? config.ssl.port : config.port, host: '::' });
