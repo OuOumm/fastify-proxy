@@ -1,12 +1,12 @@
 {
+  "name": "404 Server",
   "port": 23000,
+  "logger": true,
   "ssl": {
     "enabled": true,
     "key": "server.key",
-    "cert": "server.crt",
-    "port": 23001
+    "cert": "server.crt"
   },
-  "logger": true,
   "rules": [
     {
       "prefix": "/gh/",

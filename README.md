@@ -1,9 +1,11 @@
 <div align="center">
 
 # Fastify 高性能反向代理服务器
+
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D24.0.0-brightgreen.svg)](https://nodejs.org/) [![Fastify](https://img.shields.io/badge/Fastify-5.x-blue.svg)](https://fastify.dev/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 一个基于 Fastify 构建的高性能、轻量级反向代理服务器，支持 CDN 加速和动态代理功能。自动集成 GitHub Actions 进行 Docker 构建和推送。
+
 </div>
 
 ## 🌟 项目特性
@@ -16,7 +18,7 @@
 - 🎯 **易于部署**：零配置启动，支持 Docker 容器化
 - 📱 **响应式设计**：内置美观的 404 页面和响应式界面
 
-## 🚀 快速开始 
+## 🚀 快速开始
 
 ### 环境要求
 
@@ -35,11 +37,13 @@ cd fastify-proxy
 #### 2. 安装依赖
 
 使用 pnpm（推荐）：
+
 ```bash
 pnpm install
 ```
 
 或使用 npm/yarn：
+
 ```bash
 npm install
 # 或
@@ -57,16 +61,19 @@ cp config-demo.json config.json
 #### 4. 启动服务
 
 **开发模式**（带热重载）：
+
 ```bash
 pnpm dev
 ```
 
 **生产模式**：
+
 ```bash
 pnpm start
 ```
 
 **Node.js 原生监控模式**：
+
 ```bash
 pnpm watch
 ```
@@ -80,23 +87,27 @@ pnpm watch
 项目内置以下代理规则（定义在 `config-demo.json` 文件中，需重命名为 `config.json` 后使用）：
 
 #### 1. GitHub CDN 加速
+
 - **路径前缀**：`/gh/`
 - **目标**：`https://gcore.jsdelivr.net/gh/`
 - **用途**：加速 GitHub 仓库文件访问
 - **自定义请求头**：`{ "x-test": "test" }`
 
 **示例**：
+
 ```
 原始地址：https://raw.githubusercontent.com/user/repo/main/file.js
 代理地址：http://localhost:23000/gh/user/repo/main/file.js
 ```
 
 #### 2. 动态代理
+
 - **路径前缀**：`/proxy/`
 - **功能**：支持任意 URL 的动态代理
 - **用法**：在 `/proxy/` 后直接添加完整的目标 URL
 
 **示例**：
+
 ```
 目标网站：https://example.com/api/data
 代理地址：http://localhost:23000/proxy/https://example.com/api/data
@@ -129,11 +140,13 @@ pnpm watch
 ### API 接口
 
 #### 健康检查
+
 - **GET** `/` - 返回服务状态页面
 - **GET** `/favicon.ico` - 返回站点图标
 
 #### 代理接口
-- **ALL** `/gh/*` - GitHub CDN 代理
+
+- **ALL** `/gh/*` - GitHub CDN 代理（示例规则，实际以 `config.json` 为准）
 - **ALL** `/proxy/*` - 动态代理接口
 
 支持所有 HTTP 方法（GET、POST、PUT、DELETE、PATCH 等）。
@@ -151,7 +164,7 @@ pnpm watch
 docker build -t fastify-proxy .
 
 # 运行容器
-docker run -d -p 23000:23000 -p 23001:23001 --name fastify-proxy fastify-proxy
+docker run -d -p 23000:23000 --name fastify-proxy fastify-proxy
 ```
 
 ### Docker Compose
@@ -163,7 +176,6 @@ services:
     build: .
     ports:
       - "23000:23000"
-      - "23001:23001"
     restart: unless-stopped
     environment:
       - NODE_ENV=production
@@ -181,17 +193,17 @@ services:
 docker pull ghcr.io/OuOumm/fastify-proxy:latest
 
 # 运行容器
-docker run -d -p 23000:23000 -p 23001:23001 --name fastify-proxy ghcr.io/OuOumm/fastify-proxy:latest
+docker run -d -p 23000:23000 --name fastify-proxy ghcr.io/OuOumm/fastify-proxy:latest
 ```
 
 ## ⚙️ 配置说明
 
 ### 环境变量
 
-| 变量名 | 默认值 | 说明 |
-|--------|--------|------|
-| `PORT` | 23000 | HTTP 服务监听端口 |
-| `NODE_ENV` | development | 运行环境 |
+| 变量名        | 默认值         | 说明          |
+| ---------- | ----------- | ----------- |
+| `PORT`     | 23000       | HTTP 服务监听端口 |
+| `NODE_ENV` | development | 运行环境        |
 
 ### 配置文件
 
@@ -199,38 +211,38 @@ docker run -d -p 23000:23000 -p 23001:23001 --name fastify-proxy ghcr.io/OuOumm/
 
 ```json
 {
+  "name": "404 Server",
   "port": 23000,
   "ssl": {
     "enabled": false,
     "key": "server.key",
-    "cert": "server.crt",
-    "port": 23001
+    "cert": "server.crt"
   },
   "logger": true,
   "rules": []
 }
 ```
 
-| 配置项 | 类型 | 说明 |
-|--------|------|------|
-| `port` | number | HTTP 监听端口 |
+| 配置项           | 类型      | 说明         |
+| ------------- | ------- | ---------- |
+| `name`        | string  | 站点名称       |
+| `port`        | number  | HTTP 监听端口  |
 | `ssl.enabled` | boolean | 是否启用 HTTPS |
-| `ssl.key` | string | SSL 私钥文件路径 |
-| `ssl.cert` | string | SSL 证书文件路径 |
-| `ssl.port` | number | HTTPS 监听端口 |
-| `logger` | boolean | 是否启用日志 |
-| `rules` | array | 代理规则列表 |
+| `ssl.key`     | string  | SSL 私钥文件路径 |
+| `ssl.cert`    | string  | SSL 证书文件路径 |
+| `logger`      | boolean | 是否启用日志     |
+| `rules`       | array   | 代理规则列表     |
 
 ### 代理规则配置
 
 每个代理规则支持以下属性：
 
-| 属性 | 类型 | 说明 |
-|------|------|------|
-| `prefix` | string | 路径前缀（如 `/gh/`） |
-| `target` | string | 目标服务器地址 |
-| `headers` | object | 自定义请求头 |
-| `isDynamic` | boolean | 是否为动态代理 |
+| 属性          | 类型      | 说明                           |
+| ----------- | ------- | ---------------------------- |
+| `prefix`    | string  | 路径前缀（如 `/gh/`）               |
+| `target`    | string  | 目标服务器地址，静态代理时必填              |
+| `headers`   | object  | 自定义请求头                       |
+| `isDynamic` | boolean | 是否为动态代理，启用后请求路径会被当作完整 URL 解析 |
 
 ### 自定义配置
 
@@ -238,8 +250,6 @@ docker run -d -p 23000:23000 -p 23001:23001 --name fastify-proxy ghcr.io/OuOumm/
 
 ```json
 {
-  "port": 23000,
-  "logger": true,
   "rules": [
     {
       "prefix": "/your-prefix/",
@@ -285,6 +295,7 @@ fastify-proxy/
 ### 代码规范
 
 本项目遵循以下规范：
+
 - **ESLint**: @antfu/eslint-config
 - **Prettier**: 代码格式化
 - **Conventional Commits**: Git 提交规范
@@ -305,6 +316,7 @@ fastify-proxy/
 ### 提交规范
 
 遵循 [Conventional Commits](https://conventionalcommits.org/) 规范：
+
 - `feat`: 新功能
 - `fix`: 修复问题
 - `docs`: 文档更新
@@ -320,15 +332,18 @@ fastify-proxy/
 ## 🙋‍♂️ 常见问题
 
 ### Q: 如何添加新的代理规则？
+
 A: 编辑 `config-demo.json` 文件后重命名为 `config.json`，按照现有格式添加新的规则。
 
 ### Q: 支持 HTTPS 吗？
-A: 均支持。
+
+A: 支持。将 `config.json` 中的 `ssl.enabled` 设为 `true`，并提供 `ssl.key` 与 `ssl.cert` 文件后，服务会在同一个 `port` 上以 HTTPS 方式启动。
 
 ### Q: 如何部署到云平台？
-A: 支持所有支持 Node.js 的云平台，如 Vercel、Netlify、Heroku 等。
 
----
+A: 支持所有可运行 Node.js 服务并允许挂载 `config.json` 与可选证书文件的平台或容器环境。
+
+***
 
 <div align="center">
   <p>如果这个项目对你有帮助，请给个 ⭐️ 支持一下！</p>

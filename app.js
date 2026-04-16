@@ -1,6 +1,5 @@
 import Fastify from 'fastify';
 import { readFile } from 'fs/promises';
-import { readFileSync } from 'fs';
 import fastifyReplyFrom from '@fastify/reply-from';
 
 const [icon, html, config] = await Promise.all([
@@ -10,10 +9,10 @@ const [icon, html, config] = await Promise.all([
 ]);
 const app = Fastify({
   logger: config.logger,
-  https: config.ssl?.enabled ? { key: readFileSync(config.ssl.key), cert: readFileSync(config.ssl.cert) } : undefined
+  https: config.ssl?.enabled ? { key: await readFile(config.ssl.key), cert: await readFile(config.ssl.cert) } : undefined
 }).register(fastifyReplyFrom);
 
-app.get('/', (_, r) => r.type('text/html').send(html));
+app.get('/', (_, r) => r.type('text/html').send(html.replaceAll('{{name}}', config.name)));
 app.get('/favicon.ico', (_, r) => r.code(icon ? 200 : 404).type('image/x-icon').send(icon));
 config.rules.forEach(rule =>
   app.all(`${rule.prefix}*`, (req, r) => {
@@ -23,8 +22,8 @@ config.rules.forEach(rule =>
       r.from(url.href, {
         rewriteRequestHeaders: () => ({ ...req.headers, host: url.host, referer: url.href, ...rule.headers })
       });
-    } catch { r.code(503).type('text/html').send(html.replaceAll('404 Server', '503 Service Unavailable')); }
+    } catch { r.code(503).type('text/html').send(html.replaceAll('{{name}}', '503 Service Unavailable')); }
   })
 );
-app.all('*', (_, r) => r.code(404).type('text/html').send(html.replaceAll('404 Server', '404 Not Found')));
-app.listen({ port: config.ssl?.enabled ? config.ssl.port : config.port, host: '::' });
+app.all('*', (_, r) => r.code(404).type('text/html').send(html.replaceAll('{{name}}', '404 Not Found')));
+app.listen({ port: config.port, host: '::' });
