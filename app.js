@@ -1,15 +1,16 @@
 import Fastify from 'fastify';
 import { readFile } from 'fs/promises';
 import fastifyReplyFrom from '@fastify/reply-from';
+import { readFileSync } from 'fs';
 
 const [icon, html, config] = await Promise.all([
   readFile("favicon.ico").catch(() => null),
   readFile("index.html", "utf8").catch(() => '<h1>Proxy Server</h1>'),
-  readFile("config.json", "utf8").then(JSON.parse).catch(() => { throw new Error('配置文件不存在,请创建后再启动') })
+  readFile("config.json", "utf8").then(JSON.parse).catch(() => { throw new Error('配置文件异常,请检查后再启动') }),
 ]);
 const app = Fastify({
   logger: config.logger,
-  https: config.ssl?.enabled ? { key: await readFile(config.ssl.key), cert: await readFile(config.ssl.cert) } : undefined
+  https: config.ssl?.enabled ? { key: readFileSync(config.ssl?.key), cert: readFileSync(config.ssl?.cert) } : undefined
 }).register(fastifyReplyFrom);
 
 app.get('/', (_, r) => r.type('text/html').send(html.replaceAll('{{name}}', config.name)));
