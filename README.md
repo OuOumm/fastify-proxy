@@ -71,7 +71,7 @@ pnpm start
 pnpm watch
 ```
 
-服务将在 `http://localhost:80` 启动。
+服务将在 `http://localhost:23000` 启动（默认端口）。
 
 ## 📖 使用说明
 
@@ -88,7 +88,7 @@ pnpm watch
 **示例**：
 ```
 原始地址：https://raw.githubusercontent.com/user/repo/main/file.js
-代理地址：http://localhost/gh/user/repo/main/file.js
+代理地址：http://localhost:23000/gh/user/repo/main/file.js
 ```
 
 #### 2. 动态代理
@@ -99,7 +99,7 @@ pnpm watch
 **示例**：
 ```
 目标网站：https://example.com/api/data
-代理地址：http://localhost/proxy/https://example.com/api/data
+代理地址：http://localhost:23000/proxy/https://example.com/api/data
 ```
 
 #### 3. 自定义请求头
@@ -151,7 +151,7 @@ pnpm watch
 docker build -t fastify-proxy .
 
 # 运行容器
-docker run -d -p 80:80 -p 443:443 --name fastify-proxy fastify-proxy
+docker run -d -p 23000:23000 -p 23001:23001 --name fastify-proxy fastify-proxy
 ```
 
 ### Docker Compose
@@ -162,8 +162,8 @@ services:
   fastify-proxy:
     build: .
     ports:
-      - "80:80"
-      - "443:443"
+      - "23000:23000"
+      - "23001:23001"
     restart: unless-stopped
     environment:
       - NODE_ENV=production
@@ -181,7 +181,7 @@ services:
 docker pull ghcr.io/OuOumm/fastify-proxy:latest
 
 # 运行容器
-docker run -d -p 80:80 -p 443:443 --name fastify-proxy ghcr.io/OuOumm/fastify-proxy:latest
+docker run -d -p 23000:23000 -p 23001:23001 --name fastify-proxy ghcr.io/OuOumm/fastify-proxy:latest
 ```
 
 ## ⚙️ 配置说明
@@ -190,7 +190,7 @@ docker run -d -p 80:80 -p 443:443 --name fastify-proxy ghcr.io/OuOumm/fastify-pr
 
 | 变量名 | 默认值 | 说明 |
 |--------|--------|------|
-| `PORT` | 80 | HTTP 服务监听端口 |
+| `PORT` | 23000 | HTTP 服务监听端口 |
 | `NODE_ENV` | development | 运行环境 |
 
 ### 配置文件
@@ -199,13 +199,14 @@ docker run -d -p 80:80 -p 443:443 --name fastify-proxy ghcr.io/OuOumm/fastify-pr
 
 ```json
 {
-  "port": 80,
+  "port": 23000,
   "ssl": {
     "enabled": false,
     "key": "server.key",
     "cert": "server.crt",
-    "port": 443
+    "port": 23001
   },
+  "logger": true,
   "rules": []
 }
 ```
@@ -217,6 +218,7 @@ docker run -d -p 80:80 -p 443:443 --name fastify-proxy ghcr.io/OuOumm/fastify-pr
 | `ssl.key` | string | SSL 私钥文件路径 |
 | `ssl.cert` | string | SSL 证书文件路径 |
 | `ssl.port` | number | HTTPS 监听端口 |
+| `logger` | boolean | 是否启用日志 |
 | `rules` | array | 代理规则列表 |
 
 ### 代理规则配置
@@ -235,15 +237,18 @@ docker run -d -p 80:80 -p 443:443 --name fastify-proxy ghcr.io/OuOumm/fastify-pr
 如需自定义代理规则，请编辑 `config-demo.json` 文件后重命名为 `config.json`：
 
 ```json
-[
-  {
-    "prefix": "/your-prefix/",
-    "target": "https://your-target.com/",
-    "headers": { "Custom-Header": "value" },
-    "isDynamic": false
-  },
-  // 添加更多规则...
-]
+{
+  "port": 23000,
+  "logger": true,
+  "rules": [
+    {
+      "prefix": "/your-prefix/",
+      "target": "https://your-target.com/",
+      "headers": { "Custom-Header": "value" },
+      "isDynamic": false
+    }
+  ]
+}
 ```
 
 ## 🧪 开发指南

@@ -1,32 +1,21 @@
-FROM node:24-alpine AS builder
-
-WORKDIR /app
-
-COPY package.json pnpm-lock.yaml ./
-
-# 使用pnpm的store-dir选项并清理更彻底
-RUN npm install -g pnpm && \
-    pnpm install --prod --no-frozen-lockfile --store-dir=/tmp/pnpm-store && \
-    rm -rf /usr/local/lib/node_modules/pnpm /root/.npm /tmp/pnpm-store && \
-    # 只保留必要的文件
-    find node_modules -type f -not -name "*.js" -not -name "package.json" -delete && \
-    find node_modules -type d -name "__tests__" -o -name "test" -o -name "tests" -o -name "coverage" -o -name "docs" -o -name "examples" -o -name "benchmark" -o -name ".*" | xargs rm -rf
-
-# 使用更小的alpine镜像
 FROM node:24-alpine
 
 WORKDIR /app
 
-# 减少镜像层，合并复制命令
-COPY --from=builder /app/node_modules ./node_modules
-COPY app.js index.html config-demo.json favicon.ico ./
+# 启用 corepack 并安装 pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# 将配置示例文件重命名为正式配置文件
-RUN cp config-demo.json config.json
+# 复制依赖文件
+COPY package.json pnpm-lock.yaml ./
 
-# 清理alpine镜像中的不必要文件
-RUN rm -rf /var/cache/apk/* /tmp/* /root/.npm
+# 安装生产依赖
+RUN pnpm install --prod --frozen-lockfile
 
-EXPOSE 23000
+# 复制应用文件
+COPY app.js index.html favicon.ico ./
+COPY config-demo.json ./config.json
+
+# 暴露端口
+EXPOSE 23000 23001
 
 CMD ["node", "app.js"]
