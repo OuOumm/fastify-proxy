@@ -20,9 +20,7 @@ config.rules.forEach(rule =>
     try {
       const path = req.url.slice(rule.prefix.length);
       const url = rule.isDynamic ? new URL(path) : new URL(path, rule.target);
-      r.from(url.href, {
-        rewriteRequestHeaders: () => ({ ...req.headers, host: url.host, referer: url.href, ...rule.headers })
-      });
+      r.from(url.href, { rewriteRequestHeaders: () => ({ host: url.host, referer: url.href, ...rule.headers }) });
     } catch { r.code(503).type('text/html').send(html.replaceAll('{{name}}', '503 Service Unavailable')); }
   })
 );
