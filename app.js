@@ -16,12 +16,11 @@ const app = Fastify({
 app.get('/', (_, r) => r.type('text/html').send(html.replaceAll('{{name}}', config.name)));
 app.get('/favicon.ico', (_, r) => r.code(icon ? 200 : 404).type('image/x-icon').send(icon));
 config.rules.forEach(rule =>
-  app.all(`${rule.prefix}*`, (req, r) => {
+  app.all(`${rule.prefix}*`, (req, reply) => {
     try {
-      const path = req.url.slice(rule.prefix.length);
-      const url = rule.isDynamic ? new URL(path) : new URL(path, rule.target);
-      r.from(url.href, { rewriteRequestHeaders: () => ({ host: url.host, referer: url.href, ...rule.headers }) });
-    } catch { r.code(503).type('text/html').send(html.replaceAll('{{name}}', '503 Service Unavailable')); }
+      const path = req.url.slice(rule.prefix.length), url = rule.isDynamic ? new URL(path) : new URL(path, rule.target);
+      reply.from(url.href, { rewriteRequestHeaders: () => ({ host: url.host, referer: url.href, ...rule.headers }) });
+    } catch { reply.code(503).type('text/html').send(html.replaceAll('{{name}}', '503 Origin Service Unavailable')); }
   })
 );
 app.all('*', (_, r) => r.code(404).type('text/html').send(html.replaceAll('{{name}}', '404 Not Found')));
