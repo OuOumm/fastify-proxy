@@ -1,12 +1,12 @@
 import Fastify from 'fastify';
+import { readFileSync } from 'fs';
 import { readFile } from 'fs/promises';
 import fastifyReplyFrom from '@fastify/reply-from';
-import { readFileSync } from 'fs';
 
 const [icon, html, config] = await Promise.all([
   readFile("favicon.ico").catch(() => null),
   readFile("index.html", "utf8").catch(() => '<h1>Proxy Server</h1>'),
-  readFile("config.json", "utf8").then(JSON.parse).catch(() => { throw new Error('配置文件异常,请检查后再启动') }),
+  readFile("config.json", "utf8").then(JSON.parse).catch(() => { throw new Error('config.json error, please check.') }),
 ]);
 const app = Fastify({
   logger: config.logger,
